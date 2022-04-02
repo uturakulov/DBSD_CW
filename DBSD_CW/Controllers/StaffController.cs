@@ -21,7 +21,9 @@ namespace DBSD_CW.Controllers
         // GET: Staff/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            var repository = new StaffRepository();
+            var staff = repository.GetById(id);
+            return View(staff);
         }
 
         // GET: Staff/Create
@@ -50,21 +52,24 @@ namespace DBSD_CW.Controllers
         // GET: Staff/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var repository = new StaffRepository();
+            var staff = repository.GetById(id);
+            return View(staff);
         }
 
         // POST: Staff/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(Staff staff)
         {
+            var repository = new StaffRepository();
             try
             {
-                // TODO: Add update logic here
-
+                repository.Update(staff);
                 return RedirectToAction("Index");
             }
-            catch
+            catch(Exception ex)
             {
+                ModelState.AddModelError("", ex);
                 return View();
             }
         }
@@ -72,17 +77,19 @@ namespace DBSD_CW.Controllers
         // GET: Staff/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            var repository = new StaffRepository();
+            var staff = repository.GetById(id);
+            return View(staff);
         }
 
         // POST: Staff/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult Delete(int id, Staff staff)
         {
+            var repository = new StaffRepository();
             try
             {
-                // TODO: Add delete logic here
-
+                repository.Delete(id);
                 return RedirectToAction("Index");
             }
             catch
