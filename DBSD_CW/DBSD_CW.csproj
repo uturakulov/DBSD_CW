@@ -120,8 +120,11 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="Controllers\BranchController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\StaffController.cs" />
+    <Compile Include="DAL\IStaffRepository.cs" />
+    <Compile Include="DAL\StaffRepository.cs" />
+    <Compile Include="Models\Cook.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -129,7 +132,9 @@
     <Compile Include="Models\Hall.cs" />
     <Compile Include="Models\Manager.cs" />
     <Compile Include="Models\Menu.cs" />
+    <Compile Include="Models\Orders.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Models\Staff.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\BrandBurgerDB.mdf">
@@ -174,7 +179,8 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Branch\Index.cshtml" />
+    <Content Include="Views\Staff\Index.cshtml" />
+    <Content Include="Views\Staff\Create.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
