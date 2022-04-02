@@ -19,6 +19,23 @@ namespace DBSD_CW.DAL
             }
         }
 
+        public void Delete(int Id)
+        {
+            using (var conn = new SqlConnection(ConnStr))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE FROM [dbo].[Staff] WHERE [staff_id] = @staff_id";
+
+
+                    cmd.Parameters.AddWithValue("@staff_id", Id);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
         public IList<Staff> GetAll()
         {
             IList<Staff> staff = new List<Staff>();
@@ -48,6 +65,56 @@ namespace DBSD_CW.DAL
                             Staff.BranchId = rdr.GetInt32(rdr.GetOrdinal("branch_id"));
 
                             staff.Add(Staff);
+                        }
+                    }
+                }
+            }
+            return staff;
+        }
+
+        public Staff GetById(int Id)
+        {
+            Staff staff = null;
+
+            using (var conn = new SqlConnection(ConnStr))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT 
+                                        [staff_id], 
+                                        [first_name], 
+                                        [last_name], 
+                                        [email], 
+                                        [salary], 
+                                        [married], 
+                                        [birth_date], 
+                                        [gender], 
+                                        [role], 
+                                        [branch_id] 
+                                        FROM [dbo].[Staff]
+                                        WHERE [staff_id] = @staff_id";
+
+                    cmd.Parameters.AddWithValue("@staff_id", Id);
+
+                    conn.Open();
+
+                    using (var rdr = cmd.ExecuteReader())
+                    {
+                        if (rdr.Read())
+                        {
+                            staff = new Staff()
+                            {
+                                StaffId = Id,
+                                FirstName = rdr.GetString(rdr.GetOrdinal("first_name")),
+                                LastName = rdr.GetString(rdr.GetOrdinal("last_name")),
+                                Email = rdr.GetString(rdr.GetOrdinal("email")),
+                                Salary = rdr.GetDecimal(rdr.GetOrdinal("salary")),
+                                Married = rdr.GetBoolean(rdr.GetOrdinal("married")),
+                                BirthDate = rdr.GetDateTime(rdr.GetOrdinal("birth_date")),
+                                Gender = rdr.GetString(rdr.GetOrdinal("gender")),
+                                Role = rdr.GetString(rdr.GetOrdinal("role")),
+                                BranchId = rdr.GetInt32(rdr.GetOrdinal("branch_id")),
+                            };
                         }
                     }
                 }
@@ -93,6 +160,42 @@ namespace DBSD_CW.DAL
                     cmd.Parameters.Add(pFirstName);
 
                     cmd.Parameters.AddWithValue("@staff_id", staff.StaffId);
+                    cmd.Parameters.AddWithValue("@last_name", staff.LastName);
+                    cmd.Parameters.AddWithValue("@email", staff.Email);
+                    cmd.Parameters.AddWithValue("@salary", staff.Salary);
+                    cmd.Parameters.AddWithValue("@married", staff.Married);
+                    cmd.Parameters.AddWithValue("@birth_date", staff.BirthDate);
+                    cmd.Parameters.AddWithValue("@gender", staff.Gender);
+                    cmd.Parameters.AddWithValue("@role", staff.Role);
+                    cmd.Parameters.AddWithValue("@branch_id", staff.BranchId);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void Update(Staff staff)
+        {
+            using (var conn = new SqlConnection(ConnStr))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE [dbo].[Staff] 
+                                        SET [staff_id] = @staff_id,
+                                            [first_name] = @first_name,
+                                            [last_name] = @last_name, 
+                                            [email]      =  @email,
+                                            [salary]     =  @salary, 
+                                            [married]    =  @married, 
+                                            [birth_date] =  @birth_date,
+                                            [gender]     =  @gender, 
+                                            [role]       =  @role, 
+                                            [branch_id]  =  @branch_id
+                                        WHERE [staff_id] = @staff_id";
+
+                    cmd.Parameters.AddWithValue("@staff_id", staff.StaffId);
+                    cmd.Parameters.AddWithValue("@first_name", staff.FirstName);
                     cmd.Parameters.AddWithValue("@last_name", staff.LastName);
                     cmd.Parameters.AddWithValue("@email", staff.Email);
                     cmd.Parameters.AddWithValue("@salary", staff.Salary);

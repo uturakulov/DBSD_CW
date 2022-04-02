@@ -12,5 +12,11 @@ namespace DBSD_CW.DAL
         IList<Staff> GetAll();
 
         void Insert(Staff staff);
+
+        Staff GetById(int Id);
+
+        void Update(Staff staff);
+
+        void Delete(int Id);
     }
 }
