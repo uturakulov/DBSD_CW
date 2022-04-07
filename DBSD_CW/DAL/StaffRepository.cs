@@ -36,6 +36,83 @@ namespace DBSD_CW.DAL
             }
         }
 
+        public IList<Staff> Filter(string first_name, string last_name, string email, string branch, string role)
+        {
+            IList<Staff> staff = new List<Staff>();
+
+            using (var conn = new SqlConnection(ConnStr))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    string sql = @"SELECT s.[staff_id], s.[first_name], s.[last_name], s.[email], s.[salary], s.[married], s.[birth_date], s.[gender], s.[role],
+                                        s.[branch_id]
+                                        FROM [dbo].[Staff] s LEFT JOIN Branch b on s.branch_id = b.branch_id";
+
+                    string whereSql = "";
+
+                    if (!string.IsNullOrWhiteSpace(first_name))
+                    {
+                        whereSql += (whereSql.Length == 0 ? "" : " AND ") + " s.first_name like @first_name + '%' ";
+                        cmd.Parameters.AddWithValue("@first_name", first_name);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(last_name))
+                    {
+                        whereSql += (whereSql.Length == 0 ? "" : " AND ") + " s.last_name like @last_name + '%' ";
+                        cmd.Parameters.AddWithValue("@last_name", last_name);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(email))
+                    {
+                        whereSql += (whereSql.Length == 0 ? "" : " AND ") + " s.email like @email + '%' ";
+                        cmd.Parameters.AddWithValue("@email", email);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(role))
+                    {
+                        whereSql += (whereSql.Length == 0 ? "" : " AND ") + " s.role like @role + '%' ";
+                        cmd.Parameters.AddWithValue("@role", role);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(branch))
+                    {
+                        whereSql += (whereSql.Length == 0 ? "" : " AND ") + " b.branch_id like @branch + '%' ";
+                        cmd.Parameters.AddWithValue("@branch", branch);
+                    }
+
+                    if (!string.IsNullOrEmpty(whereSql))
+                    {
+                        whereSql = " WHERE " + whereSql;
+                    }
+
+                    cmd.CommandText = sql + whereSql;
+
+                    conn.Open();
+
+                    using (var rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            var Staff = new Staff();
+                            Staff.StaffId = rdr.GetInt32(rdr.GetOrdinal("staff_id"));
+                            Staff.FirstName = rdr.GetString(rdr.GetOrdinal("first_name"));
+                            Staff.LastName = rdr.GetString(rdr.GetOrdinal("last_name"));
+                            Staff.Email = rdr.GetString(rdr.GetOrdinal("email"));
+                            Staff.Salary = rdr.GetDecimal(rdr.GetOrdinal("salary"));
+                            Staff.Married = rdr.GetBoolean(rdr.GetOrdinal("married"));
+                            Staff.BirthDate = rdr.GetDateTime(rdr.GetOrdinal("birth_date"));
+                            Staff.Gender = rdr.GetString(rdr.GetOrdinal("gender"));
+                            Staff.Role = rdr.GetString(rdr.GetOrdinal("role"));
+                            Staff.BranchId = rdr.GetInt32(rdr.GetOrdinal("branch_id"));
+
+                            staff.Add(Staff);
+                        }
+                    }
+                }
+            }
+            return staff;
+        }
+
         public IList<Staff> GetAll()
         {
             IList<Staff> staff = new List<Staff>();
@@ -87,6 +164,7 @@ namespace DBSD_CW.DAL
                                         [email], 
                                         [salary], 
                                         [married], 
+                                        [photo], 
                                         [birth_date], 
                                         [gender], 
                                         [role], 
@@ -110,6 +188,7 @@ namespace DBSD_CW.DAL
                                 Email = rdr.GetString(rdr.GetOrdinal("email")),
                                 Salary = rdr.GetDecimal(rdr.GetOrdinal("salary")),
                                 Married = rdr.GetBoolean(rdr.GetOrdinal("married")),
+                                Photo = rdr.IsDBNull(rdr.GetOrdinal("photo")) ? null : (byte[])rdr["photo"],
                                 BirthDate = rdr.GetDateTime(rdr.GetOrdinal("birth_date")),
                                 Gender = rdr.GetString(rdr.GetOrdinal("gender")),
                                 Role = rdr.GetString(rdr.GetOrdinal("role")),
@@ -135,6 +214,7 @@ namespace DBSD_CW.DAL
                                                         [email], 
                                                         [salary], 
                                                         [married], 
+                                                        [photo], 
                                                         [birth_date], 
                                                         [gender], 
                                                         [role], 
@@ -146,6 +226,7 @@ namespace DBSD_CW.DAL
                                                         @email, 
                                                         @salary, 
                                                         @married, 
+                                                        @photo, 
                                                         @birth_date, 
                                                         @gender, 
                                                         @role, 
@@ -164,6 +245,7 @@ namespace DBSD_CW.DAL
                     cmd.Parameters.AddWithValue("@email", staff.Email);
                     cmd.Parameters.AddWithValue("@salary", staff.Salary);
                     cmd.Parameters.AddWithValue("@married", staff.Married);
+                    cmd.Parameters.AddWithValue("@photo", staff.Photo);
                     cmd.Parameters.AddWithValue("@birth_date", staff.BirthDate);
                     cmd.Parameters.AddWithValue("@gender", staff.Gender);
                     cmd.Parameters.AddWithValue("@role", staff.Role);

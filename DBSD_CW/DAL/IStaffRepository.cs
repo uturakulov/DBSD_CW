@@ -11,6 +11,8 @@ namespace DBSD_CW.DAL
     {
         IList<Staff> GetAll();
 
+        IList<Staff> Filter(string first_name, string last_name, string email, string branch, string role);
+
         void Insert(Staff staff);
 
         Staff GetById(int Id);

@@ -43,6 +43,14 @@
         </dd>
 
         <dt>
+            @Html.DisplayNameFor(model => model.Photo)
+        </dt>
+
+        <dd>
+            <img src="@Url.Action("ShowPhoto", new { id = Model.StaffId})" width="50" alt="Alternate Text" />
+        </dd>
+
+        <dt>
             @Html.DisplayNameFor(model => model.Married)
         </dt>
 

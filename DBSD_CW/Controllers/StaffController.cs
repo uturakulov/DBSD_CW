@@ -2,6 +2,7 @@
 using DBSD_CW.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -11,10 +12,11 @@ namespace DBSD_CW.Controllers
     public class StaffController : Controller
     {
         // GET: Staff
-        public ActionResult Index()
+        public ActionResult Index(string first_name, string last_name, string email, string branch, string role)
         {
             var repository = new StaffRepository();
-            var staff = repository.GetAll();
+            var staff = repository.Filter(first_name, last_name, email, branch, role);
+            ViewBag.BranchList = repository.GetAll();
             return View(staff);
         }
 
@@ -34,11 +36,20 @@ namespace DBSD_CW.Controllers
 
         // POST: Staff/Create
         [HttpPost]
-        public ActionResult Create(Staff staff)
+        public ActionResult Create(Staff staff, HttpPostedFile imageFile)
         {
             var repository = new StaffRepository();
             try
             {
+                if (imageFile?.ContentLength > 0)
+                {
+                    using (var stream = new MemoryStream())
+                    {
+                        imageFile.InputStream.CopyTo(stream);
+                        staff.Photo = stream.ToArray();
+                    }
+                }
+
                 repository.Insert(staff);
                 return RedirectToAction("Index");
             }
@@ -96,6 +107,19 @@ namespace DBSD_CW.Controllers
             {
                 return View();
             }
+        }
+
+        public FileResult ShowPhoto(int id)
+        {
+            var repo = new StaffRepository();
+            var staff = repo.GetById(id);
+
+            if (staff != null && staff.Photo?.Length > 0)
+            {
+                return File(staff.Photo, "image/jpeg", staff.FirstName + ".jpg");
+            }
+
+            return null;
         }
     }
 }
